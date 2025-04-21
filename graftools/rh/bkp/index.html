@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Formulário Movimentação de Pessoal - MP - REV.: 00</title>
+  <link rel="shortcut icon" href="icones/favicon.ico" type="image/x-icon">
+  <script language='JavaScript' type='text/JavaScript'>
+    //Escrito por DRS SISTEMAS
+    //https://www.drssistemas.com.br
+    function printpage()
+  	{
+  		window.print()
+  	}
+  </script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js" integrity="sha512-GsLlZN/3F2ErC5ifS5QtgpiJtWd43JWSuIgh7mbzZ8zBps+dvLusV+eNQATqgA/HdeKFVgA5v3S/cIrLF7QnIg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+  <style>
+    .button
+    {
+      background-color:blue;
+      border-color:red;
+      color:white;
+    }
+    body{
+        font-size: 11px;
+        background-color: rgb(240, 240, 240)
+      }
+    table
+      {
+        font-size: 11px;
+        background-color: rgb(200, 230, 250)
+      }
+    td
+      {
+        background-color: rgb(62, 64, 149)
+        <font color="white">
+        color: white;
+        text-align: center;
+      }
+    form name
+    {
+      text-align: center;
+    }
+    label 
+    {
+      width: 120px;
+      display: inline-block;
+    }
+  </style>
+</head>
+<form name='abertura'>
+  <left><input type="button" value="Imprimir / Gerar PDF" onclick="printpage()" /></left>
+</form>
+<body>
+  <div class="Content">
+      <center>
+      <table width="100%" cellspacing="1" cellpadding='1' border='2'>
+        <form name='FRM_MP'>
+          <tr>
+            <td colspan='1' rowspan='1'><P><i><b>TEXTO DA COLUNA 001</b></i></P></td>
+            <td colspan='1' rowspan='1'><P><i><b>TEXTO DA COLUNA 002</b></i></P></td>
+            <td colspan='1' rowspan='1'><P><i><b>TEXTO DA COLUNA 003</b></i></P></td>
+          </tr>
+        </form>
+      </table>
+      </center>
+  </div>
+</body>
+<button onclick="downloadPDF()" >Download</button>
+<script src="script_cadmp.js"></script>
+</html>

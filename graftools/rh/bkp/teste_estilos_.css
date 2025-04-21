@@ -1,0 +1,79 @@
+.xleftcol 
+{
+    float: left;
+    width: 33%;
+    background:#809900;
+ }
+ .xmiddlecol 
+ {
+    float: left;
+    width: 34%;
+    background:#eff2df;
+ }
+
+ body
+ {
+  background-color: rgb(240, 240, 240);
+   font-family: Arial, Helvetica, sans-serif;
+   font-size: 10px;
+ }
+
+ table
+ {
+    background-color: rgb(200, 230, 250);
+    font-family: Arial, Helvetica, sans-serif;  
+    text-align: justify;
+    table-layout: center;
+    tab-size: 300px;
+    font-size: 10px;  
+    border-spacing: 2px;
+    border-collapse: collapse;
+    align-self: stretch;
+    border-width: 3px;
+    border-color: black;
+    border-style: groove;
+    box-shadow: #809900;
+    padding: 3px;
+ }
+
+ td
+ {
+    font-size: 12px;  
+    border-spacing: 2px;
+    border-collapse: collapse;
+    align-self: stretch;
+    border-width: 3px;
+    border-color: black;
+    border-style: groove;
+    box-shadow: #809900;
+    padding: 3px;
+ }
+ 
+ h1
+ {
+   color: blue;
+   text-align: center;
+ }
+
+ h2
+ {
+   color: blue;
+   text-align: center;
+ }
+ 
+ h3
+ {
+   color: blue;
+   text-align: center;
+ }
+
+ p
+ {
+   text-align: center;
+ }
+
+ img
+ {
+   align-self: center;
+ }
+ 

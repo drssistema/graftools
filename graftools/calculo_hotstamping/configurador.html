@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hot Stamping - Home</title>
+    <link rel="shortcut icon" href="Menu/icones/favicon.ico">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f0f2f5;
+            margin: 0;
+            padding: 0;
+        }
+
+        .navbar {
+            background-color: #1c1c1c;
+            padding: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+        }
+
+        .logo img {
+            border-radius: 10px;
+        }
+
+        .container {
+            text-align: center;
+            flex-grow: 1;
+        }
+
+        .container h1 {
+            color: white;
+            margin-bottom: 20px;
+        }
+
+        button {
+            background-color: #4CAF50;
+            border: none;
+            color: white;
+            padding: 15px 25px;
+            text-align: center;
+            font-size: 16px;
+            margin: 5px;
+            border-radius: 10px;
+            box-shadow: 0 5px #2e7d32;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        button:hover {
+            background-color: #45a049;
+            box-shadow: 0 3px #1b5e20;
+            transform: translateY(2px);
+        }
+
+        button:active {
+            box-shadow: 0 2px #1b5e20;
+            transform: translateY(4px);
+        }
+    </style>
+</head>
+
+<body>
+    <nav class="navbar">
+        <div class="logo">
+            <a href="../../index.php">
+                <img src="Imagens/LOGO6_DRS.jpg" width="50px" height="50px" alt="Logo">
+            </a>
+        </div>
+
+        <div class="container">
+            <h1>FERRAMENTA P/ CÁLCULO HOTSTAMPING</h1>
+            <button onclick="window.location.href='listar.php'">CONSULTA (HOTSTAMPING)</button>
+            <button onclick="window.location.href='incluir.php'">INCLUIR  (HOTSTAMPING)</button>
+            <button onclick="window.location.href='https://www.drssistemas.com.br/calculo_hotstamping/index.php'">*** Voltar ***</button>
+        </div>
+    </nav>
+</body>
+
+</html>

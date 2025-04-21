@@ -1,0 +1,1119 @@
+<!DOCTYPE html>
+<html lang='en'>
+<head>
+<title>Embalagem</title>
+<meta charset='utf-8'>
+<meta name='viewport' content='width=device-width, initial-scale=1'>
+<script src='konva.min.js'></script>
+<script src='jquery-3.7.1.min.js'></script>
+<script src='jquery.inputmask.js'></script>
+<script src='jspdf.min.js'></script>
+<script src='math.js'></script>
+<style>
+.header {
+  background-color: #bbb;
+  padding: 1px;
+  text-align: center;
+  font-size: 0.8vw;
+  height: 2vw;
+  width: 100%; 
+}
+.flex-container {
+  display: flex;
+  align-items: stretch;
+  background-color: #f1f1f1;
+}
+.flex-container > div {
+  top: 0.5vh;
+  overflow: auto;
+}
+.main {
+  top: 0.5vh;
+  padding: 0px;
+  height: 8vw;
+  width: 100%;
+  overflow: auto; 
+}
+input[type=text]:focus {
+  background-color: yellow;
+}
+textarea {
+  overflow-y: scroll;
+  height: 35vw;
+  width: 30vw;
+  resize: none;
+  text-transform: uppercase;
+}
+.icon-rotate {
+   background-image: url(icons-rotate.png);
+   background-repeat: no-repeat;
+   background-position: center;
+   background-size: cover;
+   padding: 12px;
+   width: 0.1vw;
+   height: 0.1vw;
+}
+.icon-clear {
+   background-image: url(icons-clear.png);
+   background-repeat: no-repeat;
+   background-position: center;
+   background-size: cover;
+   padding: 12px;
+   width: 0.1vw;
+   height: 0.1vw;
+}
+.icon-zoomIn {
+   background-image: url(icons-zoom-in.png);
+   background-repeat: no-repeat;
+   background-position: center;
+   background-size: cover;
+   padding: 12px;
+   width: 0.1vw;
+   height: 0.1vw;
+}
+.icon-zoomOut {
+   background-image: url(icons-zoom-out.png);
+   background-repeat: no-repeat;
+   background-position: center;
+   background-size: cover;
+   padding: 12px;
+   width: 0.1vw;
+   height: 0.1vw;
+}
+.icon-reset {
+   background-image: url(icons-reset.png);
+   background-repeat: no-repeat;
+   background-position: center;
+   background-size: cover;
+   padding: 12px;
+   width: 0.1vw;
+   height: 0.1vw;
+}
+.icon-width {
+   background-image: url(icons-width.png);
+   background-repeat: no-repeat;
+   background-position: center;
+   background-size: cover;
+   padding: 12px;
+   width: 0.1vw;
+   height: 0.1vw;
+}
+.icon-pdf {
+   background-image: url(icons-pdf.png);
+   background-repeat: no-repeat;
+   background-position: center;
+   background-size: cover;
+   padding: 12px;
+   width: 0.1vw;
+   height: 0.1vw;
+}
+.icon-png {
+   background-image: url(icons-png.png);
+   background-repeat: no-repeat;
+   background-position: center;
+   background-size: cover;
+   padding: 12px;
+   width: 0.1vw;
+   height: 0.1vw;
+}
+.icon-tutorial {
+   background-image: url(icons-tutorial.png);
+   background-repeat: no-repeat;
+   background-position: center;
+   background-size: cover;
+   padding: 12px;
+   width: 0.1vw;
+   height: 0.1vw;
+}
+.tutorial {
+   position: fixed;
+   display: none;
+   width: 100%;
+   height: 100%;
+   top: 0;
+   left: 0;
+   right: 0;
+   bottom: 0;
+   z-index: 2;
+   cursor: pointer;
+   overflow: auto;
+   background-color: rgb(0,0,0);
+   background-color: rgba(0,0,0,0.9);    
+}
+.close_tutorial {
+  color: yellow;
+  float: left;
+  font-size: 28px;
+  font-weight: bold;
+  text-align: right;
+  width: 97%;
+  position: fixed;
+}
+
+.close_tutorial:hover,
+.close_tutorial:focus {
+  color: red;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.tutorialtext {
+  overflow: auto;	
+  position: absolute;
+  top: 0;
+  left: 10px;
+  font-size: 2vw;
+  color: yellow;
+  width:90%;
+}
+</style>
+
+<script>
+var stage;
+var layer;
+var group;
+var tr;
+var selectionRectangle;
+var szWidth = 0;
+var szHeight = 0;
+var scaleFit = 1;
+var width_auto;
+var height_auto;
+var zoomStep = 0.1;
+var scale1 = 1;
+var scaleBy = 1;
+var scale = 72.0/25.4;
+var CP = 0;
+var AT = 0;
+var LT = 0;
+var CL = 0;
+var RF = 0;
+var BC = 0;
+
+var path;  
+var vdata;
+
+
+
+
+function setDot(mm) {
+   let vinch = mm / 25.4;
+   let vdot = vinch * 72;   
+   return vdot;
+}
+function setMM(vdot) {
+   //let vinch = (vdot  * scaleFit) / 72;
+   let vinch = vdot / 72;
+   let vmm = vinch * 25.4;   
+   return vmm;
+}
+function setMM2(vdot) {
+   let vinch = (vdot  * scaleFit) / 72;
+   //let vinch = vdot / 72;
+   let vmm = vinch * 25.4;   
+   return vmm;
+}
+$(function () {
+  	$(".decimal").inputmask('decimal', {'autoUnmask': true,
+		radixPoint:',',
+		allowMinus: false,
+		rightAlign: true,
+		inputtype:"text",
+	    digits: 3,
+	    unmaskAsNumber: true,
+  	});
+  	$(".percent").inputmask('decimal', {'autoUnmask': true,
+		radixPoint:',',
+		allowMinus: false,
+		rightAlign: true,
+		inputtype:"text",
+		digits: 2,
+		suffix: '%',
+		unmaskAsNumber: true,
+    });
+    $("input").on("keydown",function(e) {
+      var keyCode = e.keyCode || e.which;
+      if (e.keyCode === 13) {
+         e.preventDefault();
+         try {
+            $("input")[$("input").index(this)+1].focus();
+         } catch (ex) {
+         	  //document.getElementById("larguraPapel").focus();
+         }         
+      }
+  
+    });   
+});
+
+function empty(e) {
+  switch (e) {
+    case "":
+    case 0:
+    case "0":
+    case null:
+    case false:
+    case undefined:
+      return true;
+    default:
+      return false;
+  }
+}
+
+function fitToWidth() {
+   let box = document.querySelector('#container');
+   let widthBox = box.offsetWidth;
+   let heightBox = box.offsetHeight;
+   scaleFit = widthBox / stage.width();
+   //console.log("scale = "+scaleFit);
+   stage.setAttrs({ scaleX: scaleFit, scaleY: scaleFit });
+   scale1 = stage.scaleX(); 
+   
+}
+
+function getScaledPointerPosition() {
+  var pointerPosition = stage.getPointerPosition();
+  //console.log(pointerPosition);
+  var stageAttrs = stage.attrs;
+  //console.log(stageAttrs);
+  if (typeof stageAttrs.scaleX === 'undefined') {
+      return {x: pointerPosition.x, y: pointerPosition.y};
+  }
+  //console.log(stageAttrs.x);
+  
+  //var x = (pointerPosition.x - stageAttrs.x) / stageAttrs.scaleX;
+  //var y = (pointerPosition.y - stageAttrs.y) / stageAttrs.scaleY;
+  var x = (pointerPosition.x) / stageAttrs.scaleX;
+  var y = (pointerPosition.y) / stageAttrs.scaleY;
+  return {x: x, y: y};
+}      
+
+function getScaledPosition(vpos) {
+  var stageAttrs = stage.attrs;
+  //console.log(stageAttrs.scaleX);
+  if (typeof stageAttrs.scaleX === 'undefined') {
+      return vpos;
+  }
+  return vpos / stageAttrs.scaleX;
+}      
+
+function getScaledSize(vsize) {
+  var stageAttrs = stage.attrs;
+  //console.log(stageAttrs.scaleX);
+  if (typeof stageAttrs.scaleX === 'undefined') {
+      return vsize;
+  }
+  return vsize / stageAttrs.scaleX;
+}      
+
+function makeLayer() {
+      
+   var width = setDot(1000);
+   var height = setDot(1000);
+
+	stage = new Konva.Stage({
+	  container: 'container',
+	  width: width,
+	  height: height,
+	});
+
+
+   layer = new Konva.Layer();
+   stage.add(layer);
+   
+   stageRect = new Konva.Rect({
+      size: stage.size(),
+      name: 'stagerect',
+      stroke: "lime"
+   });
+   layer.add(stageRect);
+
+   /*
+   marginX = new Konva.Line({
+     points: [0,-6000,0,6000],
+     stroke: 'rgb(0,161,255)',
+     strokeWidth: 1,
+     dash: [4,6],
+     x:100,
+     y:0,
+   });
+   let x = setDot(document.getElementById('txtMarginX').value);
+   let y = setDot(document.getElementById('txtMarginY').value);
+  
+  
+   marginX.x(x);
+   layer.add(marginX);
+   marginY = new Konva.Line({
+     points: [-6000,0,6000,0],
+     stroke: 'rgb(0,161,255)',
+     strokeWidth: 1,
+     dash: [4,6],
+     x: 0,
+     y: 100,
+   });
+   marginY.y(y);
+   layer.add(marginY);
+   */
+  
+   tr = new Konva.Transformer({
+      nodes: [],
+      keepRatio: true,
+      enabledAnchors: ["top-left",
+                       "top-right",
+                       "bottom-left",
+                       "bottom-right",
+      ],
+      shouldOverdrawWholeArea: true,
+      
+      boundBoxFunc: function (oldBoundBox, newBoundBox) {
+         // "boundBox" is an object with
+         // x, y, width, height and rotation properties
+         // transformer tool will try to fit nodes into that box
+
+         // the logic is simple, if new width is too big
+         // we will return previous state
+         if (Math.abs(newBoundBox.width) > MAX_WIDTH) {
+           return oldBoundBox;
+         }
+         if (Math.abs(newBoundBox.width) < MIN_WIDTH) {
+           return oldBoundBox;
+         }
+
+         return newBoundBox;
+      },
+                       
+   });
+   tr.resizeEnabled(true);
+   tr.rotateEnabled(false);
+   layer.add(tr);
+   selectionRectangle = new Konva.Rect({
+     fill: 'rgba(0,0,255,0.5)',
+     visible: false,
+   });
+   layer.add(selectionRectangle);
+   
+  
+   var x1, y1, x2, y2;
+   var selecting = false;
+   var selected = [];
+   stage.on('mousedown touchstart', (e) => {
+     // do nothing if we mousedown on any shape
+     //console.log(e.target.attrs.name);
+     //if (e.target !== stage) {
+     //  return;
+     //}
+     if (e.target.attrs.name !== "stagerect") {
+       return;
+     }
+     e.evt.preventDefault();
+     //x1 = stage.getPointerPosition().x;
+     //y1 = stage.getPointerPosition().y;
+     //x2 = stage.getPointerPosition().x;
+     //y2 = stage.getPointerPosition().y;
+
+     x1 = getScaledPointerPosition().x;
+     y1 = getScaledPointerPosition().y;
+     x2 = getScaledPointerPosition().x;
+     y2 = getScaledPointerPosition().y;
+
+
+     selectionRectangle.width(0);
+     selectionRectangle.height(0);
+     selectionRectangle.moveToTop();
+     selecting = true;
+   });
+
+   stage.on('mousemove touchmove', (e) => {
+     // do nothing if we didn't start selection
+     if (!selecting) {
+       return;
+     }
+     e.evt.preventDefault();
+     //x2 = stage.getPointerPosition().x;
+     //y2 = stage.getPointerPosition().y;
+
+     x2 = getScaledPointerPosition().x;
+     y2 = getScaledPointerPosition().y;
+     
+     //console.log("x2 = "+x2);
+     selectionRectangle.setAttrs({
+       visible: true,
+       x: Math.min(x1, x2),
+       y: Math.min(y1, y2),
+       width: Math.abs(x2 - x1),
+       height: Math.abs(y2 - y1),
+     });
+   });
+
+   stage.on('mouseup touchend', (e) => {
+     // do nothing if we didn't start selection
+     selecting = false;
+     //console.log("mouseup1");
+     //console.log("x="+e.target.parent.x());
+     x2 = getScaledPointerPosition().x;
+     y2 = getScaledPointerPosition().y;
+     //console.log("x3 = "+x2);
+    
+     var oldScale = stage.scaleX();
+     stage.setAttrs({ scaleX: 1, scaleY: 1 });
+     var absPos = e.target.parent.getAbsolutePosition();
+     updatePosition(absPos.x,absPos.y);
+     stage.setAttrs({ scaleX: oldScale, scaleY: oldScale });
+     
+     if (!selectionRectangle.visible()) {
+        //tr.nodes([]);
+        selected = [];
+        return;
+     }
+     //console.log("mouseup2");
+     e.evt.preventDefault();
+     // update visibility in timeout, so we can check it in click event
+     selectionRectangle.visible(false);
+     var shapes = stage.find('.group1');
+     var box = selectionRectangle.getClientRect();
+     selected = shapes.filter((shape) =>
+       Konva.Util.haveIntersection(box, shape.getClientRect())
+     );
+     tr.nodes(selected);
+     //console.log("selected= "+selected);
+   });
+
+   let currentShape;
+   // clicks should select/deselect shapes
+   stage.on('click tap', function (e) {
+     // if we are selecting with rect, do nothing
+     if (selected.length > 0)
+        return;
+     //currentShape = e.target.parent;
+     //console.log(currentShape); 
+     //console.log('click1 tap');
+     //console.log(tr.nodes());
+     //console.log("x="+e.target.parent.x());
+
+     if (selectionRectangle.visible()) {
+       return;
+     }
+     //console.log('click2');
+     //console.log("nodes= "+tr.nodes()); 
+     //console.log(e.target.attrs.name);
+     // if click on empty area - remove all selections
+     //if (e.target === stage) {
+     if (e.target.attrs.name === "stagerect" && selected.length ===0) {
+        tr.nodes([]);
+        return;
+     }
+     //console.log('click3');
+     //console.log(e.target.hasName('rect'));
+     //console.log(e);
+     // do nothing if clicked NOT on our rectangles
+     if (selected.length === 0) {
+        if (!e.target.parent.hasName('group1')) {
+           tr.nodes([]);
+           return;
+        }
+     }
+     //console.log('click4 tap');
+
+     // do we pressed shift or ctrl?
+     //const metaPressed = e.evt.shiftKey || e.evt.ctrlKey || e.evt.metaKey;
+     const metaPressed = e.evt.shiftKey;
+     const isSelected = tr.nodes().indexOf(e.target.parent) >= 0;
+     //console.log('metapressed='+metaPressed);
+     //console.log('isselected='+isSelected);
+
+     if (!metaPressed && !isSelected) {
+       // if no key pressed and the node is not selected
+       // select just one
+       tr.nodes([e.target.parent]);
+       //console.log('click5 tap');
+       //console.log(tr.nodes());
+     } else if (metaPressed && isSelected) {
+       // if we pressed keys and node was selected
+       // we need to remove it from selection:
+       const nodes = tr.nodes().slice(); // use slice to have new copy of array
+       // remove node from array
+       nodes.splice(nodes.indexOf(e.target.parent), 1);
+       tr.nodes(nodes);
+       //console.log('click6 tap');
+     } else if (metaPressed && !isSelected) {
+       // add the node into selection
+       //console.log(tr.nodes());
+       const nodes = tr.nodes().concat([e.target.parent]);
+       tr.nodes(nodes);
+       //console.log('click7 tap');
+       //console.log(nodes);
+     }
+     //console.log('click8 tap');
+     var oldScale = stage.scaleX();
+     stage.setAttrs({ scaleX: 1, scaleY: 1 });
+     var absPos = e.target.parent.getAbsolutePosition();
+     updatePosition(absPos.x,absPos.y);
+     stage.setAttrs({ scaleX: oldScale, scaleY: oldScale });
+     //console.log(stage.position());
+     //x2 = getScaledPointerPosition().x;
+     //y2 = getScaledPointerPosition().y;
+     //console.log("x4 = "+x2);
+     //console.log("group = "+absPos.x);
+     //console.log("group1 = "+e.target.parent.x());
+     //cross.position({x: e.target.parent.x()+(e.target.parent.getClientRect().width), y: e.target.parent.y()+(e.target.parent.getClientRect().height)});
+     //cross.position({x: e.target.parent.x(), y: e.target.parent.y()});
+     //cross.moveToTop();      
+   });
+   tr.nodes([]);
+
+ 
+   scaleFit = 1.0; //0.2;
+ 
+   stage.setAttrs({ scaleX: scaleFit, scaleY: scaleFit });
+   scale1 = stage.scaleX(); 
+
+
+}
+
+function updatePosition(x,y) {
+  //console.log("updatePostion="+x+" "+y);
+  
+  document.getElementById("txtX").value=setMM(x);
+  document.getElementById("txtY").value=setMM(y);
+
+}
+  
+  
+function repVar(v) {
+   v = v.replaceAll('CP',CP);
+   v = v.replaceAll('LT',LT);
+   v = v.replaceAll('AT',AT);
+   v = v.replaceAll('CL',CL);
+   v = v.replaceAll('BC',BC);
+   return v;
+}
+
+
+function makeShape() {
+  var wid = 0;
+  var hei = 0;
+  var on2 = true;
+  var workCtx;
+  var hasError = false;
+  var shape = new Konva.Shape({
+     x:0,
+     y:0,
+     width:0,
+     height:0,
+     name: 'shape',
+     sceneFunc: function (context, shape) {
+        wid = 0;
+        hei = 0;
+        context.beginPath();
+        let dx = 0;
+        let dy = 0;
+        vdata.forEach(function (value) {
+               const vArray = value.split(' ');
+               vArray.forEach(function (item,index,array) {
+                   if (item == 'M') {
+                      dx = array[index+1];
+                      dx = repVar(dx);
+                      dy = array[index+2];
+                      dy = repVar(dy);
+                      try {
+                        dx = setDot(math.evaluate(dx));
+                        dy = setDot(math.evaluate(dy));
+                      } catch(error) {
+                        $('#txtError').text('Erro no comando: M '+dx+' '+dy);
+                        hasError = true;   
+                      }  
+                      context.moveTo(dx,dy);  
+                      if (on2) { 
+                          //shape.absolutePosition({x: dx,y:dy}); 
+                          on2 = false;
+                      }  
+                   } 
+                   if (item == 'H') { 
+                      dx = array[index+1];
+                      dx = repVar(dx);
+                      try {
+                        dx = setDot(math.evaluate(dx));
+                      } catch(error) {
+                        $('#txtError').text('Erro no comando: H '+dx);
+                        hasError = true;   
+                      }  
+                      context.lineTo(dx,dy);  
+                      if (dx > wid)
+                         wid = dx;
+                   }
+                   if (item == 'V') { 
+                      dy = array[index+1];
+                      dy = repVar(dy);
+                      try {
+                        dy = setDot(math.evaluate(dy));
+                      } catch(error) {
+                        $('#txtError').text('Erro no comando: V '+dy);
+                        hasError = true;   
+                      }   
+                      context.lineTo(dx,dy);
+                      if (dy > hei)
+                         hei = dy;
+                   }
+                   if (item == 'L') {
+                      dx = array[index+1];
+                      dx = repVar(dx);
+                      dy = array[index+2];
+                      dy = repVar(dy);
+                      try {
+                        dx = setDot(math.evaluate(dx));
+                        dy = setDot(math.evaluate(dy));
+                      } catch(error) {
+                        $('#txtError').text('Erro no comando: L '+dx+' '+dy);
+                        hasError = true;   
+                      }   
+                      context.lineTo(dx,dy);
+                      if (dx > wid)
+                         wid = dx;
+                      if (dy > hei)
+                         hei = dy;
+                   } 
+                   if (item == 'Q') {
+                      let dx1 = array[index+1];
+                      dx1 = repVar(dx1);
+                      let dy1 = array[index+2];
+                      dy1 = repVar(dy1);
+                      dx = array[index+3];
+                      dx = repVar(dx);
+                      dy = array[index+4];
+                      dy = repVar(dy);
+                      try {
+                        dx1 = setDot(math.evaluate(dx1));
+                        dy1 = setDot(math.evaluate(dy1)); 
+
+                        dx = setDot(math.evaluate(dx));
+                        dy = setDot(math.evaluate(dy)); 
+                      } catch(error) {
+                        $('#txtError').text('Erro no comando: Q '+dx1+' '+dy1+' '+dx+' '+dy);
+                        hasError = true;   
+                      }
+                      context.quadraticCurveTo(dx1,dy1,dx,dy);  
+                      if (dx > wid)
+                          wid = dx;
+                      if (dy > hei)
+                          hei = dy;
+
+                   } 
+
+               });
+        });
+        if (!hasError)
+           $('#txtError').text('');
+        
+        //wid = wid +  RF;
+        //hei = hei +  RF;
+        shape.width(wid);
+        shape.height(hei);
+
+        
+        context.fillStrokeShape(shape);
+        //let xstroke = context.isPointInPath(10, 110);
+        //console.log('point: '+xstroke);
+     },    
+     stroke: 'black',
+     strokeWidth: 1,
+     draggable: false,
+     //opacity: 0.5,
+     //globalCompositeOperation: 'xor',    
+     //fill: 'white',     
+     //shadowColor: 'red',
+     //shadowOffset: {
+     //   x:0,
+     //   y:0
+     //},
+     //shadowBlur:0,      
+     //shadowOpacity:1,
+     //perfectDrawEnabled: false,
+    
+  });  
+  return shape;
+  
+}  
+  
+  
+function makeDraw() {
+
+   //console.log('conta');
+   //console.log(math.evaluate('10*0.1'));
+   //console.log(math.evaluate('10*0,1'));
+   try {   
+     stage.destroy();
+   } catch(error) {
+   }
+   //stage.destroyChildren();
+   makeLayer();
+   var scaleAux = stage.scaleX();   
+
+   //stage.setAttrs({ scaleX: scaleAux, scaleY: scaleAux });
+
+   var oldScale = stage.scaleX();
+   stage.setAttrs({ scaleX: 1, scaleY: 1 });
+
+  
+   CP = Number(document.getElementById('txtComprimento').value);
+   if (empty(CP))
+      CP = 10;
+   //console.log(CP);
+   AT = Number(document.getElementById('txtAltura').value);
+   if (empty(AT))
+      AT = 10;
+   LT = Number(document.getElementById('txtLateral').value);
+   if (empty(LT))
+       LT = 10;
+   CL = Number(document.getElementById('txtColagem').value);
+   if (empty(CL))
+       CL = 10;   
+   RF = Number(document.getElementById('txtRefile').value);
+   //console.log('RF='+RF);
+   BC = Number(document.getElementById('txtBoca').value);
+   if (empty(BC))
+      BC = 10;
+   var lines = document.getElementById('txtcod').value.split('\n');
+     
+   console.log(lines);
+   vdata = [];
+   for (var i = 0;i < lines.length;i++) {
+       let lin = lines[i];
+       lin = lin.replace(/\s+/g,' ');
+       lin = lin.trim();
+       lin = lin.toUpperCase();
+       if (lin.substr(0,1)=='#' || lin=='') { 
+          continue;
+       }   
+       vdata.push(lin);
+   }
+  
+  
+  
+   //var clone = path.clone();
+   //layer.add(clone);
+
+   var shape1;
+   if (RF > 0) {                                     
+      shape1 = makeShape();
+      shape1.stroke('red');
+      shape1.strokeWidth(2*RF);
+      shape1.draggable(false);                                      
+      //shape1.shadowBlur(1);
+      layer.add(shape1);                                    
+   }                                    
+   var shape = makeShape();
+   shape.draggable(false);
+   shape.fill('white');
+   shape.name('shapeMain');
+  
+   layer.add(shape);
+
+   group = new Konva.Group({
+      x: 0,
+      y: 0,
+      name: "group1",
+      draggable: true,
+   });                                       
+          
+   layer.add(group);
+   if ( RF > 0)
+       group.add(shape1);
+   group.add(shape);                                    
+
+   if (RF>0) {
+      group.absolutePosition({x: RF,y:RF}); 
+   } 
+  
+   var clone = group.clone();
+   layer.add(clone);                                    
+                                       
+  //shape.fill('white');
+             
+  
+  // document.getElementById('txtX').value = setMM(path.x());
+  // document.getElementById('txtY').value = setMM(path.y());
+  
+  
+  
+  stage.setAttrs({ scaleX: oldScale, scaleY: oldScale });
+
+} 
+
+
+</script>
+</head>
+<body>
+<div class='header' id='topheader'>
+   <button type='button' id='btnTutorial' title='Tutorial' style='width:6vw;font-size:1vw' onclick='tutorialon()'>TUTORIAL</button>
+</div>
+<div class='main'>
+<fieldset id='fieldsetRegEmb' style='background-color:white;'>
+<legend>Registro de Embalagem</legend>
+<table>
+<tr>
+  <th>Código</th>
+  <th>Sigla</th>
+  <th>Descrição da Embalagem</th>
+  <th>Compr(CP)</th>
+  <th>Altura(AT)</th>
+  <th>Lateral(LT)</th>
+  <th>Aba Colagem(CL)</th>
+  <th>Refile</th>
+  <th>Boca(BC)</th>
+  <th>Usuário</th>
+  <th>Data</th>
+</tr>
+<tr>
+  <td><input type='text' id='txtCodigo' class='decimal' style='width:3vw;'></input></td>
+  <td><input type='text' id='txtSigla' style='width:5vw;' ></input> </td>
+  <td><input type='text' id='txtDescr' style='width:19vw;'></input> </td>
+  <td><input type='text' id='txtComprimento' class='decimal'  style='width:5vw;font-size: 0.8vw;'></input> </td>
+  <td><input type='text' id='txtAltura' class='decimal'  style='width:5vw;font-size: 0.8vw;'></input> </td>
+  <td><input type='text' id='txtLateral' class='decimal'  style='width:5vw;font-size: 0.8vw;'></input> </td>
+  <td><input type='text' id='txtColagem' class='decimal'  style='width:5vw;font-size: 0.8vw;'></input> </td>
+  <td><input type='text' id='txtRefile' class='decimal'  style='width:5vw;font-size: 0.8vw;'></input> </td>
+  <td><input type='text' id='txtBoca' class='decimal' style='width:4vw;font-size: 0.8vw;'></input> </td>
+  <td><input type='text' id='txtUser' ></input> </td>
+  <td><input type='text' id='txtData' ></input> </td>
+</tr>
+</table>
+</fieldset>
+<p id='txtError' style='color: red;'> error</p>
+</div>
+<div class='flex-container'>
+ <div style='flex-grow:1'>
+  <fieldset id='fieldsetCod' style='background-color:white;width:30vw;'>
+   <legend>Codificação da Embalagem</legend>
+   <textarea id='txtcod' rows='100' cols='100' spellcheck='false' wrap='off'></textarea>
+  </fieldset>
+ </div>
+ <div style='flex-grow:1'>
+     <br><br> 
+     <button type='button' id='btnDraw' style="width: 4vw;font-size: 0.8vw" onclick='makeDraw()'>Desenhar</button><br>
+
+     <button type="button" id='stage1ZoomIn' class="icon-zoomIn" title="Aumentar" style="width: 1vw;font-size: 1vw"></button><br>
+     <button type="button" id='stage1ZoomOut' class="icon-zoomOut" title="Diminuir" style="width: 1vw;font-size: 1vw"></button><br>
+     <button type="button" id='reset' class="icon-reset" title="Tamanho Normal" style="width: 1vw;font-size: 1vw"></button><br>
+     <button type="button" id='fitToWidth' class="icon-width" title="Ajusta na largura" style="width: 1vw;font-size: 1vw" onclick="fitToWidth()"></button><br>
+     <button type="button" id='savepdf' class="icon-pdf" style="width: 1vw;font-size: 1vw"></button><br>
+     <button type="button" id='saveimg' class="icon-png" style="width: 1vw;font-size: 1vw"></button>
+     <br><br>
+     <label for='txtWidth'>Largura</label><br>
+     <input type='text' id='txtWidth' class='decimal' style='width:5vw' value='10'></input>
+     <br>
+     <label for='txtHeight'>Altura</label><br>
+     <input type='text' id='txtHeight' class='decimal' style='width:5vw' value='10'></input>
+     <br><br>
+     <label for='txtX'>X:</label>
+     <input type='text' id='txtX' class='decimal' style='width:5vw' value='0'></input><br>
+     <label for='txtY'>Y:</label>
+     <input type='text' id='txtY' class='decimal' style='width:5vw' value='0'></input>
+ 
+ </div>
+ <div id='container' style='flex-grow:40;background-color:white;width:20vw;height:70vh;overflow:auto;'>
+ </div>
+</div>
+<div class='tutorial' id='tutorial' onclick='tutorialoff()'>
+  <span class='close_tutorial'>&times;</span>
+  <div class='tutorialtext' id='tutorialtext'>
+  <p style='font-size: 1vw;'>
+    M x y  --> Move para a posicao inicial<br>
+    H x    --> Linha Horizontal<br>
+    V y    --> Linha Vertical<br>
+    L x y  --> Linha <br>
+    Q cpx cpy x y --> Curva Belzier <br>
+    <br>
+    M -> Posiciona na posição inicial  x y<br>
+    H -> Linha Horizontal onde x representa a posição final<br> 
+    V -> Linha Vertical onde y representa a posição final<br>   
+    L -> Linha  onde x,y representa a posição final <br>
+    Q -> Quadratic Belzier -> cpx,cpx representa o ponto de controle e x,y a posição final<br>
+         O ponto de controle faz a linha curvar.
+    
+    A posição inicial de cada elemento é a posição final do último elemento traçado.<br>
+    Se tiver que reposionar use o M x y.<br>
+    Exemplo: Para desenhar um retangulo <br>
+             M 0 0<br>
+             H 100<br>
+             V 40<br>
+             H 0<br>
+             V 0<br>
+             #para traçar uma linha no meio # na primeira coluna serve como comentario.<br>
+             M 50 0<br>
+             V 40<br>
+             
+     Deixe o desenho proximo do lado esquerdo e proximo do topo<br> 
+     senão pode haver um espaço na esquerda e no topo que ficará<br> 
+     sendo parte do desenho.     
+     <br>
+     Quando houver uma expressão aritmetica em x ou y<br>
+     Não poderá haver espaço entre os numeros<br>
+     ficando desta forma 10*0.01 ou 10+20-2<br>
+     deverá ser usado o ponto decimal e não a virgula.    
+</div>
+
+<script>
+
+txtX.addEventListener('keydown', function (e) {
+   //console.log("xposition");
+  	if (e.keyCode == 13) {
+ 		var x = document.getElementById("txtX").value;
+ 		if (Number(x) == "NaN")
+    		return; 
+ 		var y = document.getElementById("txtY").value;
+ 		if (Number(y) == "NaN")
+    		return;
+ 		//console.log("xposition="+x+" yposition="+y)   
+		var nodes = tr.nodes();
+		nodes.forEach((item,index) => {
+          var oldScale = stage.scaleX();
+          stage.setAttrs({ scaleX: 1, scaleY: 1 });
+    		item.absolutePosition({x: setDot(x), y:setDot(y)});
+    		updatePosition(item.x(),item.y());
+          stage.setAttrs({ scaleX: oldScale, scaleY: oldScale});
+    		return;
+		});
+   }
+});
+
+txtY.addEventListener('keydown', function (e) {
+  	if (e.keyCode == 13) {
+ 		var x = document.getElementById("txtX").value;
+ 		if (Number(x) == "NaN")
+    		return; 
+ 		var y = document.getElementById("txtY").value;
+ 		if (Number(y) == "NaN")
+    		return;
+ 		//console.log("xposition="+x+" yposition="+y)   
+		var nodes = tr.nodes();
+		nodes.forEach((item,index) => {
+          var oldScale = stage.scaleX();
+          stage.setAttrs({ scaleX: 1, scaleY: 1 });
+    		item.absolutePosition({x: setDot(x), y:setDot(y)});
+    		updatePosition(item.x(),item.y());
+          stage.setAttrs({ scaleX: oldScale, scaleY: oldScale});
+    		return;
+		});
+   }
+});
+ 
+ 
+document.getElementById('stage1ZoomIn').addEventListener(
+  'click',
+  function () {
+    zoomStage1(zoomStep);
+  		    //console.log(stage.scaleX());
+  	 scaleFit = stage.scaleX();
+  },
+);      
+document.getElementById('stage1ZoomOut').addEventListener(
+  'click',
+  function () {
+    zoomStage1(-zoomStep);
+  		    //console.log(stage.scaleX());
+  	 scaleFit = stage.scaleX();
+  },
+);      
+
+
+function zoomStage1(inc) {
+  scale1 = scale1 + inc;
+  if (scale1 >=0.1) {
+     stage.setAttrs({ scaleX: scale1, scaleY: scale1 });
+  } else {
+  	  scale1 = 0.1;
+  }   
+  scaleFit = stage.scaleX();
+}
+document.getElementById('reset').addEventListener(
+  'click',
+  function () {
+  			scale1 = 1;
+  			scaleFit = 1;
+  			stage.scale({ x: scale1, y: scale1 });
+  },
+);      
+
+document.getElementById('savepdf').addEventListener('click', function () {
+  		  //document.getElementById("loader").style.display = "block";
+  		  //document.getElementById("loader").style.display = "none";
+  		  //document.getElementById("loader").style.display = "block";
+  var scale2 = 1;
+  stage.scale({ x: scale2, y: scale2 });
+
+  var pdf = new jsPDF('p', 'pt', [stage.width(), stage.height()]);
+  pdf.setTextColor('#000000');
+  // first add texts
+  stage.find('Text').forEach((text) => {
+    const size = text.fontSize() / 0.75; // convert pixels to points
+    pdf.setFontSize(size);
+    pdf.text(text.text(), text.x(), text.y(), {
+      baseline: 'top',
+      angle: -text.getAbsoluteRotation(),
+    });
+  });
+  // then put image on top of texts (so texts are not visible)
+  stageRect.stroke("white"); 
+  tr.nodes([]);
+
+  pdf.addImage(
+	    stage.toDataURL({ pixelRatio: 1 }),
+	    0,
+	    0,
+	    stage.width(),
+	    stage.height()
+  );
+
+  pdf.save('embalagem.pdf');
+  
+  stageRect.stroke("lime");  
+  stage.setAttrs({ scaleX: scaleFit, scaleY: scaleFit });
+  //document.getElementById("loader").style.display = "none";
+});   			       		
+
+
+function downloadURI(uri, name) {
+  var link = document.createElement('a');
+  link.download = name;
+  link.href = uri;
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+  delete link;
+}
+
+document.getElementById('saveimg').addEventListener(
+  'click',
+  function () {
+    stageRect.stroke("white");
+    tr.nodes([]);
+    var scale2 = 1;
+    stage.scale({ x: scale2, y: scale2 });
+    var dataURL = stage.toDataURL({ pixelRatio: 1 });
+    downloadURI(dataURL, 'embalagem.png');
+    stageRect.stroke("lime");
+    stage.setAttrs({ scaleX: scaleFit, scaleY: scaleFit });
+  },
+  false
+);
+
+//document.getElementById('txtMarginX').value = 10;
+//document.getElementById('txtMarginY').value = 10;
+document.getElementById('txtX').value = 0;
+document.getElementById('txtY').value = 0;
+
+
+
+var modal = document.getElementById('tutorial');
+var span = document.getElementsByClassName('close_tutorial')[0];
+span.onclick = function() {
+  modal.style.display = 'none';
+}
+function tutorialon() {
+  document.getElementById('tutorial').style.display = 'block';
+}
+function tutorialoff() {
+  document.getElementById('tutorial').style.display = 'none';
+}
+</script>
+</body>
+</html>

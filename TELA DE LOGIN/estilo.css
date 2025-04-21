@@ -1,0 +1,153 @@
+*{
+    margin: 0px;
+    padding: 0px;
+}
+body
+{
+    background-image: url("../IMAGENS/fundo_login.jpg");
+    background-position: 100% 100%;
+    width: 100%;
+    /*color: white;*/
+    font-family: Arial;
+}
+input
+{
+    display: block;
+    height: 30px;
+    width: 300px;
+    margin: 10px;
+    border-radius: 20px;
+    border:1px solid black;
+    font-size: 12pt;
+    padding: 7px 15px;
+    color: black;
+    border-color: rgba(255, 255, 255, 0.01);
+    background-color:lavender;
+    outline: none;
+}
+
+.classe-alerta
+{
+    display: block;
+    height: 55px;
+    width: 100px;
+    margin: 10px;
+    border-radius: 20px;
+    border:1px solid black;
+    font-size: 16pt;
+    padding: 7px 15px;
+    color: black;
+    border-color: rgba(255, 255, 255, 0.01);
+    background-color:lavender;
+    outline: none;
+}
+
+div#corpo-form
+{
+    border-radius: 5px;
+    border:3px solid #FFF;
+    background-color:whitesmoke;
+    width: 400px;
+    margin: 160px auto 130px auto;
+}
+div#corpo-form-cad
+{
+    border-radius: 5px;
+    border:3px solid #FFF;
+    background-color: rgba(250, 250, 250, 0.3)
+    width: 400px;
+    margin: 45px auto 130px auto;
+}
+div#corpo-form h1
+{
+    text-align: center;
+    color:darkblue;
+    padding: 20px;
+}
+div#corpo-form-cad h1
+{
+    text-align: center;
+    color:darkblue;
+    padding: 20px;
+}
+div#form-acessar h4
+{
+    text-align: center;
+    color:darkblue;
+    padding: 20px;
+}
+
+
+a
+{
+   color: darkblue;
+   text-decoration: none; 
+   text-align: center;
+   display: block;
+}
+h2
+{
+   color: darkblue;
+   text-decoration: none; 
+   text-align: center;
+   display: block;
+}
+a:hover
+{
+    text-decoration: underline;
+}
+input[type=submit]
+{
+    background-color:aquamarine;
+    border: none;
+    cursor: pointer;
+}
+input[type=button]
+{
+    background-color:aquamarine;
+    border: none;
+    cursor: pointer;
+}
+.fechar
+{
+    /*background-color:deepskyblue;*/
+    background-color:lightgreen;
+    border:2px;
+    cursor: pointer;
+    font-size: 25px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+}
+
+::-webkit-input-placeholder{
+    color: black;
+}
+
+:-moz-placeholder{
+    color: black;
+}
+
+::-moz-placeholder{
+    color: black;
+}
+:-ms-input-placeholder{
+    color: black;
+}
+
+div#msg-sucesso{
+    width: 400px;
+    margin: 10px auto;
+    padding: 10px;
+    background-color: rgba(50, 205, 50, 0.3);
+    border: 1px solid rgba(34, 139, 34);
+}
+
+div.msg-erro{
+    width: 400px;
+    margin: 10px auto 10px auto;
+    padding: 10px;
+    background-color: rgba(250, 128, 114, 0.3);
+    border: 1px solid rgba(165, 42, 42);
+}

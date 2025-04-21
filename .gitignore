@@ -1,0 +1,7 @@
+# Ignorar arquivos e pastas sensíveis
+.env
+*.log
+*.bak
+*.tmp
+/vendor/
+node_modules/

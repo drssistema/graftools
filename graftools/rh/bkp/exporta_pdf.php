@@ -1,0 +1,104 @@
+<?php
+?>
+    <html lang="en">
+        <head>
+            <meta charset="UTF-8">
+            <meta http-equiv="X-UA-Compatible" content="IE=edge">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <title>Documento para gerar PDF</title>
+        </head>
+    <body>
+        <style>
+            section{text-align: center;}
+            #maintable{width: 80%; text-align: center; margin: auto 10%;}
+            .minhatabela{width: 100%; padding: 20px;}
+            .minhatabela thead{background-color: gray;}
+            .minhatabela tfoot{background-color: antiquewhite;}
+        </style>
+        <section>
+            <div>
+                <h1>Exportar tabela PDF de maneira simples</h1>
+            </div>
+            <div id="maintable">
+                <h1>minhatabela</h1>
+                <table class="minhatabela">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Mês</th>
+                            <th>Gastos</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>1</td>
+                            <td>Janeiro</td>
+                            <td>R$150</td>
+                        </tr>
+                        <tr>
+                            <td>1</td>
+                            <td>Fevereiro</td>
+                            <td>R$250</td>
+                        </tr>
+                    </tbody>
+                    <tfoot>
+                        <tr>
+                            <td>Total</td>
+                            <td>2</td>
+                            <td>R$400</td>
+                        </tr>
+                    </tfoot>
+                </table>
+            </div>
+            <div>
+                <br><br>
+                <button id="pdfout">GERAR ARQ PDF </button>
+            </div>
+        </section>
+    <!-- Scripts -->
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js" integrity="sha512-qZvrmS2ekKPF2mSznTQsxqPgnpkI4DNTlrdUmTzrDgektczlKNRRhy5X5AAOnx5S09ydFYWWNSfcEqDTTHgtNA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js" integrity="sha512-BNaRQnYJYiPSqHHDb58B0yaPfCu+Wgds8Gp/gU33kqBtgNS4tSPHuGibyoeqMV/TJlSKda6FXzoEyYGjTe+vXA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+        <script>
+            var maintable = document.getElementById('maintable'),
+            pdfout = document.getElementById('pdfout');
+
+            pdfout.onclick = function()
+            {
+                var doc = new jsPDF('p', 'pt', 'letter');
+                var margin = 20;
+                var scale = (doc.internal.pageSize.width - margin * 2) / document.body.clientWidth;
+                var scale_mobile = (doc.internal.pageSize.width - margin * 2) / document.body.getBoundingClientRect();
+
+                // checando
+                if(/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)){
+	                // mobile
+                    doc.html(maintable, {
+       		            x: margin,
+                        y: margin,
+                        html2canvas:{
+                	        scale: scale_mobile,
+                        },
+                        callback: function(doc){
+                	        doc.output('dataurlnewwindow',{filename: 'pdf.pdf'});
+                        }
+                    });
+                } else{
+                    // PC
+                    doc.html(maintable, {
+       		            x: margin,
+                        y: margin,
+                        html2canvas:{
+                	        scale: scale,
+                        },
+                        callback: function(doc){
+                	        doc.output
+                            ('dataurlnewwindow',
+                            {filename: 'pdf.pdf'});
+                        }
+	                });
+                }
+            };
+        </script>
+    </body>
+    </html>
+
